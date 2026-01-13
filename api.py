@@ -35,24 +35,24 @@ class SliceRequest(BaseModel):
             }
         }
 
-pptx_files: List[str]
-    image_files: Optional[List[str]] = None
+
 class SliceResponse(BaseModel):
     """Response model with details of created files"""
     success: bool
     message: str
     total_slides: int
-    output_files: List[str]
-2.0.0",
-        "endpoints": {
-            "/slice": "POST - Split a PowerPoint file into individual slides (PPTX + images)
+    pptx_files: List[str]
+    image_files: Optional[List[str]] = None
+
+
+@app.get("/")
 def read_root():
     """Root endpoint with API information"""
     return {
         "name": "PowerPoint Slicer API",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "endpoints": {
-            "/slice": "POST - Split a PowerPoint file into individual slides",
+            "/slice": "POST - Split a PowerPoint file into individual slides (PPTX + images)",
             "/docs": "GET - Interactive API documentation",
             "/health": "GET - Health check"
         }
@@ -67,7 +67,8 @@ def health_check():
 
 @app.post("/slice", response_model=SliceResponse)
 def slice_powerpoint(request: SliceRequest):
-    """ (PPTX files and images)
+    """
+    Split a PowerPoint file into individual slides (PPTX files and images)
     
     - **file_path**: Absolute path to the PowerPoint file (local)
     - **output_pptx_dir**: Optional output directory for PPTX files
@@ -126,8 +127,7 @@ def slice_powerpoint(request: SliceRequest):
                 total_slides=len(pptx_files),
                 pptx_files=pptx_files,
                 image_files=None
-                output_files=created_files
-        )
+            )
         
     except FileNotFoundError as e:
         raise HTTPException(status_code=404, detail=str(e))
